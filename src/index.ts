@@ -23,6 +23,9 @@ function closeModal(id: string) {
 const projectListUI=document.getElementById("project-list") as HTMLElement
 const projectManager=new ProjectManager(projectListUI)
 
+
+
+
 const newProjectBtn=document.getElementById("new-proyect-btn");
 if (newProjectBtn) {
     newProjectBtn.addEventListener("click", () => {showModal("new-project-modal")})
