@@ -32,6 +32,7 @@ export class ProjectManager {
             if(!projectsPage|| !detailsPage){return}
             projectsPage.style.display="none"
             detailsPage.style.display="flex"
+            this.setDetailsPage(project)
             
         })
         // Agregar la interfaz de usuario del proyecto al contenedor principal
@@ -40,11 +41,39 @@ export class ProjectManager {
         // Agregar el proyecto a la lista de proyectos gestionados
         this.list.push(project);
     
-        // Devolver la instancia del proyecto recién creado
         return project;
     }
 
-    
+    private setDetailsPage(project:Project){
+        const detailsPage=document.getElementById("project-details")
+        if(!detailsPage){
+            return
+        }
+        const name=detailsPage.querySelector("[data-project-info='name']") //buscamos un elemento HTML a traves de su atributo
+        if(name) {name.textContent=project.name}
+
+        const description=detailsPage.querySelector("[data-project-info='description']") 
+        if(description) {description.textContent=project.description}
+
+        const name2=detailsPage.querySelector("[data-project-info='name2']") 
+        if(name2) {name2.textContent=project.name}
+
+        const description2=detailsPage.querySelector("[data-project-info='description2']") 
+        if(description2) {description2.textContent=project.description}
+
+        const estado2=detailsPage.querySelector("[data-project-info='estado2']") 
+        if(estado2) {estado2.textContent=project.status}
+
+        const coste2=detailsPage.querySelector("[data-project-info='coste2']") 
+        //if(coste2){coste2.value=project.cost.toString(); }
+
+        const role2=detailsPage.querySelector("[data-project-info='role2']") 
+        if(role2) {role2.textContent=project.userRole}
+
+        const fechafin2=detailsPage.querySelector("[data-project-info='fecha-fin2']") 
+        //if (fechafin2) { fechafin2.valueAsDate = new Date(project.finishDate); }
+    }
+
     getProject(id: string): Project | undefined {
         const project = this.list.find((project) => project.id === id);
         return project;
