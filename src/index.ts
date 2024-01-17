@@ -29,6 +29,7 @@ const projectManager=new ProjectManager(projectListUI)
 const newProjectBtn=document.getElementById("new-proyect-btn");
 if (newProjectBtn) {
     newProjectBtn.addEventListener("click", () => {showModal("new-project-modal")})
+   
 } else {
     console.warn("No se ha encontrado el botón de nuevos proyectos")
 }
@@ -39,32 +40,47 @@ if (projectForm && projectForm instanceof HTMLFormElement) {
         e.preventDefault(); 
         const formData = new FormData(projectForm)
         
+        const projectName = formData.get("name") as string;
+        if (projectName.length < 5) {
+            const mensaje = document.getElementById("err") as HTMLElement;
+            mensaje.textContent = "El nombre del proyecto debe tener al menos 5 caracteres.";
+            toggleModal("error");
+            return;
+        }
+        const projectDate = formData.get("finishDate") as string;
+        let finishDate;
+        if (projectDate) {
+            finishDate = new Date(projectDate);
+        } else {
+            finishDate = new Date();
+        }
+
         const projectData: IProject = {
-            name: formData.get("name") as string,
+            name: projectName,
             description: formData.get("description") as string,
             userRole: formData.get("userRole") as UserRole,
             status: formData.get("status") as ProjectStatus,
-            finishDate: new Date(formData.get("finishdate")as string)
+            finishDate: finishDate,
         };
         try{
             const project = projectManager.newProject(projectData)
             projectForm.reset()
-            closeModal("new-project-modal")
+            toggleModal("new-project-modal")
+            projectManager.getNameProject(projectData.name)
         } catch(error){
-            window.alert(error)
+           // window.alert(error)
+            const mensaje=document.getElementById("err") as HTMLElement
+            mensaje.textContent=error
+            toggleModal("error")
+
         }
-        
+        projectManager.getTotalCost();
     })
 } else {
     console.warn("The project form was not found. Check the ID!")
 }
 
-const cancelBtn=document.getElementById("cancela-btn")
-if(cancelBtn){
-    cancelBtn.addEventListener("click",()=>{
-        closeModal("new-project-modal")
-    })
-}
+
 
 const exportProjectsBtn=document.getElementById("export-projects-btn")
 if(exportProjectsBtn){
@@ -85,9 +101,93 @@ if (btnProyectos) {
     btnProyectos.addEventListener("click",()=>{
         const projectsPage=document.getElementById("project-page")
         const detailsPage=document.getElementById("project-details")
+        
         if(!projectsPage|| !detailsPage){return}
         projectsPage.style.display="flex"
         detailsPage.style.display="none"
         
     })
 }
+
+
+
+const btnError=document.getElementById("btnError")
+if(btnError){
+    btnError.addEventListener("click",()=>{
+        toggleModal("error")
+    })
+}
+
+/*M2-3.8  cierra ventana dialogo*/
+const cancelBtn=document.getElementById("cancela-btn")
+if(cancelBtn){
+    cancelBtn.addEventListener("click",()=>{
+        toggleModal("new-project-modal")
+    })
+}
+
+function toggleModal(id : string){
+    const modal=document.getElementById(id)
+    if (modal && modal instanceof HTMLDialogElement) {
+        if(modal.open)
+            modal.close();
+        else +
+            modal.showModal()
+        }
+    else console.warn("Id is not found" , id)
+}
+
+// Obtén una referencia al elemento con el ID "project-list"
+var projectList = document.getElementById("project-list");
+
+if (projectList) {
+    // Obtén la primera tarjeta dentro de "project-list"
+    var firstCard = projectList.querySelector('.project-card');
+
+    if (firstCard) {
+        // Elimina  del DOM
+        firstCard.remove();
+    } else {
+        console.warn("No se encontró ninguna tarjeta para eliminar.");
+    }
+} else {
+    console.warn("No se encontró el elemento con el ID 'project-list'.");
+}
+
+const btnEdit = document.getElementById('btnEdit');
+const editProjectModal = document.getElementById('edit-project-modal');
+
+if (btnEdit && editProjectModal) {
+    btnEdit.addEventListener('click', () => {
+        const projectNameElement = document.querySelector('[data-project-info="name2"]');
+        const projectDescriptionElement = document.querySelector('[data-project-info="description2"]');
+        const projectStatusElement = document.querySelector('[data-project-info="estado2"]');
+        const projectCostElement = document.querySelector('[data-project-info="coste2"]');
+        const projectRoleElement = document.querySelector('[data-project-info="role2"]');
+        
+        const editProjectNameInput = document.querySelector('[name="nameEdit"]')as HTMLInputElement;
+        const editProjectDescriptionInput = document.querySelector('[name="descriptionEdit"]')as HTMLInputElement;
+       
+        // Otros campos de edición
+        
+        if (projectNameElement && projectDescriptionElement && editProjectNameInput && editProjectDescriptionInput) {
+            const projectName = projectNameElement.textContent ?? ""; // Valor predeterminado es una cadena vacía si es nulo
+            const projectDescription = projectDescriptionElement.textContent ?? ""; // Valor predeterminado es una cadena vacía si es nulo
+        
+       
+
+            // Asigna los datos del proyecto a los campos del formulario
+            editProjectNameInput.value = projectName;
+            editProjectDescriptionInput.value = projectDescription;
+            // Asigna otros datos según sea necesario
+
+            // Muestra el modal de edición
+            showModal('edit-project-modal');
+        } else {
+            console.error('Los elementos de proyecto o de edición no se encontraron.');
+        }
+    });
+}
+
+    
+

@@ -44,34 +44,61 @@ export class ProjectManager {
         return project;
     }
 
+
+
+    getTotalCost() {
+        let totalCost = 0;
+        this.list.forEach((project) => {
+            totalCost += project.cost;
+        });
+
+    console.log("Coste total de los proyectos: "+totalCost)
+          //   return totalCost;
+    }
+
+    getNameProject(name:string){
+        const project=this.list.find((project)=>{
+            return project.name===name;
+        })
+        console.log("El nombre es: "+project)
+    }
+    
+
     private setDetailsPage(project:Project){
+        console.log("Contenido de project:", project);
+
         const detailsPage=document.getElementById("project-details")
-        if(!detailsPage){
-            return
-        }
-        const name=detailsPage.querySelector("[data-project-info='name']") //buscamos un elemento HTML a traves de su atributo
+        if(!detailsPage){return}
+    
+        const name=detailsPage.querySelector("[data-project-info='name2']") 
         if(name) {name.textContent=project.name}
 
-        const description=detailsPage.querySelector("[data-project-info='description']") 
+        const description=detailsPage.querySelector("[data-project-info='description2']") 
         if(description) {description.textContent=project.description}
 
-        const name2=detailsPage.querySelector("[data-project-info='name2']") 
-        if(name2) {name2.textContent=project.name}
+        const estado=detailsPage.querySelector("[data-project-info='estado2']") 
+        if(estado) {estado.textContent=project.status}
 
-        const description2=detailsPage.querySelector("[data-project-info='description2']") 
-        if(description2) {description2.textContent=project.description}
+        const coste = detailsPage.querySelector("[data-project-info='coste2']");
+        if (coste) {coste.textContent = project.cost.toString();}
 
-        const estado2=detailsPage.querySelector("[data-project-info='estado2']") 
-        if(estado2) {estado2.textContent=project.status}
+        const role=detailsPage.querySelector("[data-project-info='role2']") 
+        if(role) {role.textContent=project.userRole}
 
-        const coste2=detailsPage.querySelector("[data-project-info='coste2']") 
-        //if(coste2){coste2.value=project.cost.toString(); }
+        const fechafin = detailsPage.querySelector("[data-project-info='fecha-fin2']");
+        if (fechafin) {
+            let fechaObjeto = new Date(project.finishDate);
+            fechafin.textContent = fechaObjeto.toDateString();
+        }
 
-        const role2=detailsPage.querySelector("[data-project-info='role2']") 
-        if(role2) {role2.textContent=project.userRole}
+        const progress = detailsPage.querySelector("[data-project-info='progress']") as HTMLElement;
+        if (progress) {
+            progress.style.width=project.progress+"%"
+            progress.textContent=project.progress+"%"
+        }
 
-        const fechafin2=detailsPage.querySelector("[data-project-info='fecha-fin2']") 
-        //if (fechafin2) { fechafin2.valueAsDate = new Date(project.finishDate); }
+        const iniciales= detailsPage.querySelector("[data-project-info='iniciales']");
+        if(iniciales){iniciales.textContent=project.name.slice(0, 2).toUpperCase()}
     }
 
     getProject(id: string): Project | undefined {
@@ -79,7 +106,7 @@ export class ProjectManager {
         return project;
     }
 
-    getProjectNome(name: string): Project | undefined {
+    getProjectName(name: string): Project | undefined {
         const project = this.list.find((project) => project.name === name);
         return project;
     }
@@ -170,4 +197,31 @@ export class ProjectManager {
         // Simular un clic en el elemento de entrada de archivo para abrir el cuadro de diálogo de selección de archivos
         input.click();
     }
+
+    editProject(id: string, newData: IProject): void {
+        const project = this.getProject(id);
+
+        if (!project) {
+            console.error(`No se encontró un proyecto con el ID ${id}`);
+            return;
+        }
+
+        // Actualizar la información del proyecto con los nuevos datos
+        project.name = newData.name;
+        project.description = newData.description;
+        project.status = newData.status;
+        project.userRole = newData.userRole;
+        project.finishDate = newData.finishDate;
+
+        // Actualizar la interfaz de usuario
+        this.updateProjectUI(project);
+    }
+
+    private updateProjectUI(project: Project): void {
+        // Aquí deberías actualizar la interfaz de usuario del proyecto con los nuevos datos
+        // Puedes llamar a la función que utilizas para mostrar los detalles del proyecto
+        this.setDetailsPage(project);
+    }
+
+
 }
