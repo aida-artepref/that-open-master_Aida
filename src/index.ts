@@ -156,7 +156,6 @@ if (projectList) {
 
 const btnEdit = document.getElementById('btnEdit');
 const editProjectModal = document.getElementById('edit-project-modal');
-
 if (btnEdit && editProjectModal) {
     btnEdit.addEventListener('click', () => {
         const projectNameElement = document.querySelector('[data-project-info="name2"]');
@@ -164,27 +163,43 @@ if (btnEdit && editProjectModal) {
         const projectStatusElement = document.querySelector('[data-project-info="estado2"]');
         const projectCostElement = document.querySelector('[data-project-info="coste2"]');
         const projectRoleElement = document.querySelector('[data-project-info="role2"]');
-        
-        const editProjectNameInput = document.querySelector('[name="nameEdit"]')as HTMLInputElement;
-        const editProjectDescriptionInput = document.querySelector('[name="descriptionEdit"]')as HTMLInputElement;
-        const editProjectRoleInput = document.querySelector('[name="UserRoleEdit"]')as HTMLInputElement;
-        const editProjectDescriptionInput = document.querySelector('[name="descriptionEdit"]')as HTMLInputElement;
-        const editProjectDescriptionInput = document.querySelector('[name="descriptionEdit"]')as HTMLInputElement;
-       
-        // Otros campos de edición
-        
-        if (projectNameElement && projectDescriptionElement && editProjectNameInput && editProjectDescriptionInput) {
-            const projectName = projectNameElement.textContent ?? ""; // Valor predeterminado es una cadena vacía si es nulo
-            const projectDescription = projectDescriptionElement.textContent ?? ""; // Valor predeterminado es una cadena vacía si es nulo
+        const projectDateElement = document.querySelector('[data-project-info="fecha-fin2"]');
+
+        const editProjectNameInput = document.querySelector('[name="nameEdit"]') as HTMLInputElement;
+        const editProjectDescriptionInput = document.querySelector('[name="descriptionEdit"]') as HTMLInputElement;
+        const editProjectStatusInput = document.querySelector('[name="statusEdit"]') as HTMLSelectElement;
+        const editProjectRoleInput = document.querySelector('[name="userRoleEdit"]') as HTMLSelectElement;
+        const editProjectFinishdateInput = document.querySelector('[name="finishDate"]') as HTMLInputElement;
+        const editProjectCostInput = document.querySelector('[name="coste"]') as HTMLInputElement;
+
+        if (projectNameElement && projectDescriptionElement && projectStatusElement && projectCostElement &&
+            projectRoleElement && projectDateElement && editProjectNameInput && editProjectDescriptionInput &&
+            editProjectStatusInput && editProjectRoleInput && editProjectFinishdateInput && editProjectCostInput) {
+
+            const projectName = projectNameElement.textContent ?? "";
+            const projectDescription = projectDescriptionElement.textContent ?? "";
             const projectStatus = projectStatusElement.textContent ?? "";
             const projectCost = projectCostElement.textContent ?? "";
             const projectRole = projectRoleElement.textContent ?? "";
-       
+
+            // La fecha en formato de texto (ejemplo: "Wed Jan 17 2024")
+            const projectDateText = projectDateElement.textContent ?? "";
+
+            // Convierte la fecha de texto a un objeto Date
+            const projectDate = new Date(projectDateText);
 
             // Asigna los datos del proyecto a los campos del formulario
             editProjectNameInput.value = projectName;
             editProjectDescriptionInput.value = projectDescription;
-            // Asigna otros datos según sea necesario
+            editProjectRoleInput.value = projectRole;
+            editProjectStatusInput.value = projectStatus;
+
+            // Asigna la fecha al campo de fecha del formulario
+            const formattedDate = `${projectDate.getFullYear()}-${(projectDate.getMonth() + 1).toString().padStart(2, '0')}-${projectDate.getDate().toString().padStart(2, '0')}`;
+            editProjectFinishdateInput.value = formattedDate;
+
+            // Asigna el coste al campo de coste del formulario
+            editProjectCostInput.value = projectCost;
 
             // Muestra el modal de edición
             showModal('edit-project-modal');
@@ -193,6 +208,3 @@ if (btnEdit && editProjectModal) {
         }
     });
 }
-
-    
-
