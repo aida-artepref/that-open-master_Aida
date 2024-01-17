@@ -167,13 +167,18 @@ if (btnEdit && editProjectModal) {
         
         const editProjectNameInput = document.querySelector('[name="nameEdit"]')as HTMLInputElement;
         const editProjectDescriptionInput = document.querySelector('[name="descriptionEdit"]')as HTMLInputElement;
+        const editProjectRoleInput = document.querySelector('[name="UserRoleEdit"]')as HTMLInputElement;
+        const editProjectDescriptionInput = document.querySelector('[name="descriptionEdit"]')as HTMLInputElement;
+        const editProjectDescriptionInput = document.querySelector('[name="descriptionEdit"]')as HTMLInputElement;
        
         // Otros campos de edición
         
         if (projectNameElement && projectDescriptionElement && editProjectNameInput && editProjectDescriptionInput) {
             const projectName = projectNameElement.textContent ?? ""; // Valor predeterminado es una cadena vacía si es nulo
             const projectDescription = projectDescriptionElement.textContent ?? ""; // Valor predeterminado es una cadena vacía si es nulo
-        
+            const projectStatus = projectStatusElement.textContent ?? "";
+            const projectCost = projectCostElement.textContent ?? "";
+            const projectRole = projectRoleElement.textContent ?? "";
        
 
             // Asigna los datos del proyecto a los campos del formulario
