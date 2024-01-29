@@ -67,6 +67,7 @@ button{
     background-color: var(--primary);
     display: flex; 
     align-items: center;
+    margin: 5px;
 }
 
 button:hover{
@@ -82,13 +83,41 @@ button span.material-icons-round {
     color: white;
 }
 
+#error{
+    color:white
+}
+
+#errorMensaje{
+    background-color:var(--background-300);
+    padding: 1rem;
+    border-radius: 5px;
+    display: block;
+    text-align: center; 
+    border: 2px solid #ccc;
+}
+
+#errorMensaje .material-icons-round {
+    margin-right: 10px; 
+    background-color: red;
+    border-radius: 1rem
+}
+
+#btnError {
+    display: block; 
+    margin: auto; 
+}
 
 .page {
     display: flex;
     flex-direction: column;
     height: 100%;
 }
-
+#btnError{
+    display: block;
+    margin:auto;
+    margin-top: 1rem;
+    
+}
 /* SLIDERBAR */
 #slidebar {
     background-color: var(--background);
@@ -220,7 +249,7 @@ dialog::backdrop {
 }
 
 form {
-    width: 450px; 
+    width: 350px; 
     border-radius: 10px; 
     background-color: var(--background-100);
     color: white;
@@ -245,7 +274,7 @@ form .form-field-container {
 
 label {
     font-size: var(--font-base);
-    margin-bottom: 10px;
+    margin-bottom: 5px;
     font-weight: 500;
     color: rgb(241, 241, 241);
     display: flex;
@@ -265,6 +294,73 @@ input, textarea, select {
 input:focus, textarea:focus, select:focus {
     outline: 2px solid var(--primary);
 }
+
+/* EDIT MODAL */
+#edit-project-modal {
+    background-color: transparent;
+    border: none;
+    margin: auto;
+    box-shadow: 0 0 100px rgba(0, 0, 0, 0.8); 
+}
+
+#edit-project-modal::backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(3px);
+}
+
+
+#edit-project-form {
+    width: 450px;
+    border-radius: 10px;
+    background-color: var(--background-100);
+    color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Añade esta línea para la sombra difuminada */
+}
+
+#edit-project-form h2 {
+    padding: 20px;
+    border-bottom: 2px solid var(--background-200);
+}
+
+#edit-project-form .input-list {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    row-gap: 25px;
+}
+
+#edit-project-form .form-field-container {
+    display: flex;
+    flex-direction: column;
+}
+
+#edit-project-form label {
+    font-size: var(--font-base);
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: rgb(241, 241, 241);
+    display: flex;
+    align-items: center;
+    column-gap: 5px;
+}
+
+#edit-project-form input,
+#edit-project-form textarea,
+#edit-project-form select {
+    color: white;
+    background-color: var(--background-200);
+    padding: 15px;
+    border-radius: 8px;
+    border: none;
+    font-size: var(--font-base);
+}
+
+#edit-project-form input:focus,
+#edit-project-form textarea:focus,
+#edit-project-form select:focus {
+    outline: 2px solid var(--primary);
+}
+
 
 
 /* SECCION PROJECT-DETAILS  */
@@ -297,15 +393,19 @@ input:focus, textarea:focus, select:focus {
 }
 
 .todo-item {
-    padding: 20px;
-    background-color: var(--background-200);
+    padding: 10px;
+    background-color:var(--bacground-100);
     border-radius: 10px;
     cursor: pointer;
+    
+}
+.todo-item.checked {
+    background-color: green; 
 }
 
-.todo-item:hover {
+/* .todo-item:hover {
     background-color: var(--primary);
-}
+} */
 
 
 /*USUARIOS LISTA  */
