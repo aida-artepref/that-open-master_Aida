@@ -82,9 +82,9 @@
                 <div class="project-card">
                     <div class="card-header">
                         <p style="background-color: var(--primary); padding: 10px; border-radius: 8px; aspect-ratio: 1;">HC</p>
-                        <div>
+                        <div class="card-header-cabecera">
                             <h5>Nombre Proyecto</h5>
-                            <p>Descripcion</p>
+                            <p id="descriptionCard">Descripcion</p>
                         </div>
                     </div>
                     <div class="card-content">
@@ -155,8 +155,10 @@
                         <input name="coste" type="text" ></input>
                     </div>
                     <div style="display: flex; margin: 10px 0px 10px auto; column-gap: 10px;">
-                        <button id="cancela-btn" type="button">Cancela</button>
-                        <button type="submit">Acepta</button>
+                        <!-- <button id="cancela-btn" type="button">Cancela</button> -->
+                        <button id="cancelaEdita" type="button">Cancela</button>
+                        <!-- <button type="submit">Acepta</button> -->
+                        <button id="aceptaEdita" type="button">Acepta</button>
                     </div>
                 </div> 
             </form>
@@ -213,11 +215,11 @@
                                     <span class="material-icons-round">search</span>
                                     <input type="text" placeholder="Search To-Do's by name" style="width: 100%;">
                                 </div>
-                                <span class="material-icons-round">add</span>
+                                <span id="btnAddTodo" class="material-icons-round">add</span>
                             </div>
                             </div>
-                            <div style="display: flex; flex-direction: column; padding: 10px 30px; row-gap: 20px;">
-                            <div class="todo-item">
+                            <div style="display: flex; flex-direction: column; padding: 10px 30px; row-gap:20px;">
+                            <!-- <div class="todo-item">
                                 <div style="display: flex; justify-content: space-between; align-items: center;">
                                     <div style="display: flex; column-gap: 15px; align-items: center;">
                                         <span class="material-icons-round" style="padding: 10px; background-color: #686868; border-radius: 10px;">construction</span>
@@ -226,24 +228,44 @@
                                     <p style="text-wrap: nowrap; margin-left: 10px;">Fri, 20 sep</p>
                                 </div>
                             </div>
-                            </div>
+                            </div> -->
 
-                            <div style="display: flex; flex-direction: column; padding: 10px 30px; row-gap: 20px;">
-                                <!-- Formulario para agregar nuevo TO-DO -->
+                            <!-- <div style="display: flex; flex-direction: column; padding: 10px 30px; row-gap: 20px;">
+                                 Formulario para agregar nuevo TO-DO 
                                 <form id="todo-form">
                                     <div style="display: flex; justify-content: space-between; align-items: center;">
                                         <div style="display: flex; column-gap: 15px; align-items: center;">
                                             <span class="material-icons-round" style="padding: 10px; background-color: #686868; border-radius: 10px;">construction</span>
                                             <input type="text" id="todo-description" placeholder="Enter TO-DO description">
                                         </div>
-                                        <button type="button" >Add</button>
+                                        <button id="add-todo-btn" type="button" >Add</button>
                                     </div>
                                 </form>
                         
-                                <!-- Lista de TO-DOs -->
+                                Lista de TO-DOs 
                                 <div id="todo-list"></div>
+                            </div> -->
+                            <div style="display: flex; flex-direction: column; padding: 10px 30px; row-gap: 20px;">
+                                <!-- Formulario para agregar nuevo TO-DO -->
+                                <form id="todo-form">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <div style="display: flex; column-gap: 5px; align-items: center;">
+                                            <span class="material-icons-round" style="padding: 10px; background-color: #686868; border-radius: 10px;">construction</span>
+                                            <input type="text" id="todo-description" placeholder="Enter TO-DO description">
+                                        </div>
+                                        <button id="add-todo-btn" type="button">Add</button>
+                                    </div>
+                                </form>
+                            
+                                <!-- Lista de TO-DOs -->
+                                <div style="display: flex; flex-direction: column; padding: 10px 30px; row-gap:20px;">
+                                    <div class="todo-item" id="todo-list">
+                                        
+                                    </div>
+                                </div>
+                                
                             </div>
-
+                            
 
                         </div>
 

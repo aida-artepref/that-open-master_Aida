@@ -1,4 +1,4 @@
-import{ IProject, ProjectStatus, UserRole} from "./classes/Project.ts"
+import{ IProject, ProjectStatus, UserRole, IToDo} from "./classes/Project.ts"
 import { ProjectManager } from "./classes/ProjectManager.ts"
 
 
@@ -106,6 +106,7 @@ if (btnProyectos) {
         projectsPage.style.display="flex"
         detailsPage.style.display="none"
         
+        
     })
 }
 
@@ -154,57 +155,204 @@ if (projectList) {
     console.warn("No se encontró el elemento con el ID 'project-list'.");
 }
 
+
 const btnEdit = document.getElementById('btnEdit');
 const editProjectModal = document.getElementById('edit-project-modal');
+
 if (btnEdit && editProjectModal) {
     btnEdit.addEventListener('click', () => {
+        // obtiene nombre del proyecto desde la interfaz de usuario
         const projectNameElement = document.querySelector('[data-project-info="name2"]');
-        const projectDescriptionElement = document.querySelector('[data-project-info="description2"]');
-        const projectStatusElement = document.querySelector('[data-project-info="estado2"]');
-        const projectCostElement = document.querySelector('[data-project-info="coste2"]');
-        const projectRoleElement = document.querySelector('[data-project-info="role2"]');
-        const projectDateElement = document.querySelector('[data-project-info="fecha-fin2"]');
+        const projectName = projectNameElement?.textContent || "";
 
-        const editProjectNameInput = document.querySelector('[name="nameEdit"]') as HTMLInputElement;
-        const editProjectDescriptionInput = document.querySelector('[name="descriptionEdit"]') as HTMLInputElement;
-        const editProjectStatusInput = document.querySelector('[name="statusEdit"]') as HTMLSelectElement;
-        const editProjectRoleInput = document.querySelector('[name="userRoleEdit"]') as HTMLSelectElement;
-        const editProjectFinishdateInput = document.querySelector('[name="finishDate"]') as HTMLInputElement;
-        const editProjectCostInput = document.querySelector('[name="coste"]') as HTMLInputElement;
+        // Encuentra el proyecto en la lista de proyectos gestionados por ProjectManager
+        const project = projectManager.getProjectName(projectName);
 
-        if (projectNameElement && projectDescriptionElement && projectStatusElement && projectCostElement &&
-            projectRoleElement && projectDateElement && editProjectNameInput && editProjectDescriptionInput &&
-            editProjectStatusInput && editProjectRoleInput && editProjectFinishdateInput && editProjectCostInput) {
+        if (project) {
+            // Obtén los elementos del formulario de edición
+            const editProjectNameInput = document.querySelector('[name="nameEdit"]') as HTMLInputElement;
+            const editProjectDescriptionInput = document.querySelector('[name="descriptionEdit"]') as HTMLInputElement;
+            const editProjectStatusInput = document.querySelector('[name="statusEdit"]') as HTMLSelectElement;
+            const editProjectRoleInput = document.querySelector('[name="userRoleEdit"]') as HTMLSelectElement;
+            const editProjectFinishdateInput = document.querySelector('[name="finishDate"]') as HTMLInputElement;
+            const editProjectCostInput = document.querySelector('[name="coste"]') as HTMLInputElement;
 
-            const projectName = projectNameElement.textContent ?? "";
-            const projectDescription = projectDescriptionElement.textContent ?? "";
-            const projectStatus = projectStatusElement.textContent ?? "";
-            const projectCost = projectCostElement.textContent ?? "";
-            const projectRole = projectRoleElement.textContent ?? "";
+            if (editProjectNameInput && editProjectDescriptionInput &&
+                editProjectStatusInput && editProjectRoleInput &&
+                editProjectFinishdateInput && editProjectCostInput) {
 
-            // La fecha en formato de texto (ejemplo: "Wed Jan 17 2024")
-            const projectDateText = projectDateElement.textContent ?? "";
+                // los datos del proyecto pasan a llenar el formulario de edición
+                editProjectNameInput.value = project.name;
+                editProjectDescriptionInput.value = project.description;
+                editProjectRoleInput.value = project.userRole;
+                editProjectStatusInput.value = project.status;
 
-            // Convierte la fecha de texto a un objeto Date
-            const projectDate = new Date(projectDateText);
+                // Formatea la fecha al formato esperado por el input de fecha
+                const formattedDate = `${project.finishDate.getFullYear()}-${(project.finishDate.getMonth() + 1).toString().padStart(2, '0')}-${project.finishDate.getDate().toString().padStart(2, '0')}`;
+                editProjectFinishdateInput.value = formattedDate;
 
-            // Asigna los datos del proyecto a los campos del formulario
-            editProjectNameInput.value = projectName;
-            editProjectDescriptionInput.value = projectDescription;
-            editProjectRoleInput.value = projectRole;
-            editProjectStatusInput.value = projectStatus;
+                // Asigna el coste al campo de coste del formulario
+                editProjectCostInput.value = project.cost.toString();
 
-            // Asigna la fecha al campo de fecha del formulario
-            const formattedDate = `${projectDate.getFullYear()}-${(projectDate.getMonth() + 1).toString().padStart(2, '0')}-${projectDate.getDate().toString().padStart(2, '0')}`;
-            editProjectFinishdateInput.value = formattedDate;
-
-            // Asigna el coste al campo de coste del formulario
-            editProjectCostInput.value = projectCost;
-
-            // Muestra el modal de edición
-            showModal('edit-project-modal');
+                showModal('edit-project-modal');
+            } else {
+                console.error('Los elementos del formulario de edición no se encontraron.');
+            }
         } else {
-            console.error('Los elementos de proyecto o de edición no se encontraron.');
+            console.error(`No se encontró un proyecto con el nombre ${projectName}`);
         }
     });
 }
+
+
+
+const btnCancelaEdita = document.getElementById("cancelaEdita");
+const btnAceptaEdita = document.getElementById("aceptaEdita");
+
+if (btnCancelaEdita && btnAceptaEdita) {
+    btnCancelaEdita.addEventListener("click", () => {
+        closeModal("edit-project-modal"); 
+    });
+    btnAceptaEdita.addEventListener("click", () => {
+        const projectNameElement = document.querySelector('[data-project-info="name2"]');
+        const projectName = projectNameElement?.textContent || "";
+        const currentProject = projectManager.getProjectName(projectName);
+
+        if (currentProject) {
+            // Obtén los elementos del formulario de edición
+            const editProjectNameInput = document.querySelector('[name="nameEdit"]') as HTMLInputElement;
+            const editProjectDescriptionInput = document.querySelector('[name="descriptionEdit"]') as HTMLInputElement;
+            const editProjectStatusInput = document.querySelector('[name="statusEdit"]') as HTMLSelectElement;
+            const editProjectRoleInput = document.querySelector('[name="userRoleEdit"]') as HTMLSelectElement;
+            const editProjectFinishdateInput = document.querySelector('[name="finishDate"]') as HTMLInputElement;
+            const editProjectCostInput = document.querySelector('[name="coste"]') as HTMLInputElement;
+
+            if (editProjectNameInput && editProjectDescriptionInput &&
+                editProjectStatusInput && editProjectRoleInput &&
+                editProjectFinishdateInput && editProjectCostInput) {
+
+                // Actualiza los campos del proyecto con los valores del formulario
+                currentProject.name = editProjectNameInput.value;
+                currentProject.description = editProjectDescriptionInput.value;
+                currentProject.status = editProjectStatusInput.value;
+                currentProject.userRole = editProjectRoleInput.value;
+                currentProject.finishDate = new Date(editProjectFinishdateInput.value);
+                currentProject.cost = parseFloat(editProjectCostInput.value);
+                closeModal("edit-project-modal");
+                projectManager.updateProjectUI(currentProject);
+            } else {
+                console.error('Los elementos del formulario de edición no se encontraron.');
+            }
+        } else {
+            console.error(`No se encontró un proyecto con el nombre ${projectName}`);
+        }
+    });
+}
+const btnAddTodo = document.getElementById('add-todo-btn');
+
+if (btnAddTodo) {
+    btnAddTodo.addEventListener('click', () => {
+        const todoDescriptionInput = document.getElementById("todo-description");
+        const todoListElement = document.getElementById("todo-list");
+
+        if (todoDescriptionInput && todoListElement) {
+            const todoDescription = todoDescriptionInput.value;
+
+            // Obtén el nombre del proyecto actualmente visualizado
+            const projectNameElement = document.querySelector('[data-project-info="name2"]');
+            const projectName = projectNameElement?.textContent || "";
+            
+            // Obtén la instancia del proyecto actual
+            const currentProject = projectManager.getProjectName(projectName);
+
+            if (currentProject) {
+                // Agrega el ToDo al proyecto
+                const newTodo = {
+                    description: todoDescription,
+                    completed: false,
+                };
+
+                currentProject.addTodo(newTodo);
+
+                // Limpia el valor del input después de agregar el ToDo (opcional)
+                todoDescriptionInput.value = "";
+
+                // Actualiza y muestra la lista de To-Dos, incluyendo los To-Dos del proyecto actual
+                updateTodoList(currentProject.todos, todoListElement);
+
+                // Actualiza la interfaz de usuario del proyecto
+                projectManager.updateProjectUI(currentProject);
+            }
+        }
+    });
+}
+
+export { updateTodoList };
+function updateTodoList(todos, todoListElement) {
+    
+    // Limpiar la lista existente
+    todoListElement.innerHTML = "";
+
+    // Crear y agregar elementos de la lista solo para los To-Dos del proyecto actual
+    todos.forEach((todo) => {
+        const todoItem = document.createElement("div");
+        todoItem.classList.add("todo-item");
+
+        const todoContent = document.createElement("div");
+        todoContent.style.display = "flex";
+        todoContent.style.justifyContent = "space-between";
+        todoContent.style.alignItems = "center";
+
+        
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.addEventListener('change', () => {
+            if (checkbox.checked) {
+                todoItem.classList.add('checked');
+            } else {
+                todoItem.classList.remove('checked');
+            }
+        });
+        
+        
+        const description = document.createElement("p");
+        description.textContent = todo.description.description; 
+
+        const date = document.createElement("p");
+        date.style.marginLeft = "10px";
+        date.textContent = formatDate(new Date()); // fecha actual del sistema
+
+        const deleteIcon = document.createElement("span");
+        deleteIcon.innerHTML = "&#128465;"; 
+        deleteIcon.style.cursor = "pointer"; 
+
+        // Añadir un evento de clic al icono de papelera para eliminar el ToDo
+        deleteIcon.addEventListener("click", () => {
+            const projectNameElement = document.querySelector('[data-project-info="name2"]');
+            const projectName = projectNameElement?.textContent || "";
+            const currentProject = projectManager.getProjectName(projectName);
+
+            if (currentProject) {
+                currentProject.deleteTodo(todo.id);
+                updateTodoList(currentProject.todos, todoListElement);
+                projectManager.updateProjectUI(currentProject);
+            }
+        });
+
+        todoContent.appendChild(checkbox);
+        todoContent.appendChild(description);
+        todoContent.appendChild(date);
+        todoContent.appendChild(deleteIcon);
+
+        todoItem.appendChild(todoContent);
+
+        todoListElement.appendChild(todoItem);
+    });
+}
+function formatDate(date) {
+    const options = { weekday: 'long', year: 'numeric', month: 'numeric', day: 'numeric' };
+   // const formattedDate = date.toLocaleDateString('en-US', options);
+    const weekday = new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(date);
+    return `${weekday},  ${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+}
+

@@ -1,4 +1,10 @@
 import { IProject, Project } from "./Project";
+import { updateTodoList } from '../index';
+
+export interface ExportedProject {
+    project: IProject;
+    todos: IToDo[];
+}
 
 export class ProjectManager {
     // Lista de proyectos gestionados por el ProjectManager
@@ -29,7 +35,9 @@ export class ProjectManager {
         project.ui.addEventListener("click",()=>{
             const projectsPage=document.getElementById("project-page")
             const detailsPage=document.getElementById("project-details")
-            if(!projectsPage|| !detailsPage){return}
+            if(!projectsPage|| !detailsPage){
+                return
+            }
             projectsPage.style.display="none"
             detailsPage.style.display="flex"
             this.setDetailsPage(project)
@@ -43,7 +51,6 @@ export class ProjectManager {
     
         return project;
     }
-
 
 
     getTotalCost() {
@@ -69,7 +76,20 @@ export class ProjectManager {
 
         const detailsPage=document.getElementById("project-details")
         if(!detailsPage){return}
-    
+
+        //actualiza datelles en cabecera de detalles-proyecto
+        const nameHeader = detailsPage.querySelector("[data-project-info='name']");
+        const descriptionHeader = detailsPage.querySelector("[data-project-info='description']");
+
+        if (nameHeader) {
+            nameHeader.textContent = project.name;
+        }
+
+        if (descriptionHeader) {
+            descriptionHeader.textContent = project.description;
+        }
+
+        //actualiza datelles en card de detalles-proyecto
         const name=detailsPage.querySelector("[data-project-info='name2']") 
         if(name) {name.textContent=project.name}
 
@@ -99,6 +119,13 @@ export class ProjectManager {
 
         const iniciales= detailsPage.querySelector("[data-project-info='iniciales']");
         if(iniciales){iniciales.textContent=project.name.slice(0, 2).toUpperCase()}
+
+        const todoListElement = detailsPage.querySelector("#todo-list");
+
+        // Actualiza la lista de todos con los todos del proyecto actual
+        if (todoListElement) {
+            updateTodoList(project.todos, todoListElement);
+        }
     }
 
     getProject(id: string): Project | undefined {
@@ -133,6 +160,24 @@ export class ProjectManager {
 
     
     exportToJSON(fileName: string = "projects"): void {
+             // Crear un array para almacenar la información exportada de cada proyecto
+             const exportedProjects: ExportedProject[] = [];
+
+             // Iterar sobre la lista de proyectos
+             this.list.forEach((project) => {
+                 // Crear un objeto con la información del proyecto y sus todos
+                 const exportedProject: ExportedProject = {
+                     project: {
+                         name: project.name,
+                         description: project.description,
+                         // ... otras propiedades del proyecto
+                     },
+                     todos: project.todos,
+                 };
+     
+                 // Agregar el objeto a la lista de proyectos exportados
+                 exportedProjects.push(exportedProject);
+             });
         // Convertir la lista de proyectos a formato JSON
         const json = JSON.stringify(this.list, null, 2);
     
@@ -217,11 +262,28 @@ export class ProjectManager {
         this.updateProjectUI(project);
     }
 
-    private updateProjectUI(project: Project): void {
-        // Aquí deberías actualizar la interfaz de usuario del proyecto con los nuevos datos
-        // Puedes llamar a la función que utilizas para mostrar los detalles del proyecto
+    updateProjectUI(project: Project): void {
+        // Actualiza la interfaz de detalles del proyecto
         this.setDetailsPage(project);
+    
+        // Actualiza la interfaz de la tarjeta de proyecto
+        const projectCard = this.findProjectCard(project.id);
+        if (projectCard) {
+            console.log(projectCard)
+            project.updateUI();
+        }
     }
-
+    
+    private findProjectCard(projectId: string): HTMLElement | null {
+    const projectCards = this.ui.querySelectorAll('.project-card');
+    for (const card of projectCards) {
+        const projectIdAttribute = card.getAttribute('data-project-id');
+        if (projectIdAttribute === projectId) {
+            return card as HTMLElement;
+        }
+    }
+    return null;
+}
+   
 
 }

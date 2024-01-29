@@ -67,6 +67,7 @@ button{
     background-color: var(--primary);
     display: flex; 
     align-items: center;
+    margin: 5px;
 }
 
 button:hover{
@@ -248,7 +249,7 @@ dialog::backdrop {
 }
 
 form {
-    width: 450px; 
+    width: 350px; 
     border-radius: 10px; 
     background-color: var(--background-100);
     color: white;
@@ -392,15 +393,19 @@ input:focus, textarea:focus, select:focus {
 }
 
 .todo-item {
-    padding: 20px;
-    background-color: var(--background-200);
+    padding: 10px;
+    background-color:var(--bacground-100);
     border-radius: 10px;
     cursor: pointer;
+    
+}
+.todo-item.checked {
+    background-color: green; 
 }
 
-.todo-item:hover {
+/* .todo-item:hover {
     background-color: var(--primary);
-}
+} */
 
 
 /*USUARIOS LISTA  */

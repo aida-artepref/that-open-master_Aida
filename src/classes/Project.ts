@@ -9,6 +9,7 @@ export interface IProject{
         status:ProjectStatus
         userRole: UserRole
         finishDate: Date  
+        todos: IToDo[];
 }
 
 
@@ -18,11 +19,13 @@ export class Project implements IProject{
         status: "Pendiente"|"Activo"|"Acabado"
         userRole: "Arquitecto"|"Ingeniero"|"Modelador"
         finishDate: Date
-
+        
         ui:HTMLDivElement
         cost: number=0
         progress: number=0
         id:string
+
+        todos: IToDo[] = [];
 
         constructor(data: IProject){
                 // for(const key in data){
@@ -39,9 +42,10 @@ export class Project implements IProject{
         }
 
         setUI(){
-                if(this.ui){return}
+                
                 this.ui=document.createElement("div")
                 this.ui.className="project-card"
+                this.ui.setAttribute('data-project-id', this.id); 
                 this.ui.innerHTML=`
         
                 <div class="card-header">
@@ -49,7 +53,7 @@ export class Project implements IProject{
 
                         <div>
                                 <h5>${this.name}</h5>
-                                <p>${this.description}</p>
+                                <p id="descriptionCard">${this.description}</p>
                         </div>
                 </div>
                 <div class="card-content">
@@ -71,39 +75,71 @@ export class Project implements IProject{
                         </div>
                 </div>
                 `;
-                // const btnEdit=document.getElementById("btnEdit"); 
-                // if(btnEdit){
-                //         btnEdit.addEventListener("click",()=> this.editProject());
-                //         //this.ui.appendChild(btnEdit);
-                // }
         }
                 
-        // editProject() {
-        //         const newName = prompt("Ingrese el nuevo nombre del proyecto", this.name);
-        //         const newDescription = prompt("Ingrese la nueva descripción del proyecto", this.description);
-                
-        //         // Actualizar la información del proyecto
-        //         if (newName && newDescription) {
-        //                 this.name = newName;
-        //                 this.description = newDescription;
-                        
-        //                 // Actualizar la interfaz de usuario
-        //                 this.updateUI();
-        //         }
-        // }
+
         updateUI() {
-                // Aquí debes actualizar los elementos de la interfaz de usuario con los nuevos valores del proyecto
-                // Por ejemplo:
+                
                 const nameElement = this.ui.querySelector(".card-header h5");
                 if (nameElement) {
                         nameElement.textContent = this.name;
                 }
-        
-                const descriptionElement = this.ui.querySelector(".card-header p");
+                const descriptionElement = this.ui.querySelector("#descriptionCard");
                 if (descriptionElement) {
                         descriptionElement.textContent = this.description;
                 }
+                const statusElement = this.ui.querySelector(".card-content .card-property p:nth-child(2)");
+                if (statusElement) {
+                        statusElement.textContent = this.status;
+                }
+                const roleElement = this.ui.querySelector(".card-content .card-property:nth-child(2) p:nth-child(2)");
+                if (roleElement) {
+                        roleElement.textContent = this.userRole;
+                }
+                const costElement = this.ui.querySelector(".card-content .card-property:nth-child(3) p:nth-child(2)");
+                if (costElement) {
+                        costElement.textContent = this.cost.toString();
+                }
+                const progressElement = this.ui.querySelector(".card-content .card-property:nth-child(4) p:nth-child(2)");
+                if (progressElement) {
+                        progressElement.textContent = `${this.progress * 100}%`;
+                }
         }
+
+        getEditData(): IProject {
+                return {
+                        name: this.name,
+                        description: this.description,
+                        userRole: this.userRole,
+                        status: this.status,
+                        finishDate: this.finishDate,
+                };
+        }
+
+
+        addTodo(description: string): void {
+                const todo: IToDo = {
+                        id: uuidv4(),
+                        description: description,
+                        completed: false,
+                };
+                this.todos.push(todo);
+                this.updateUI();
+        }
+
+        deleteTodo(todoId: string): void {
+                this.todos = this.todos.filter((todo) => todo.id !== todoId);
+                this.updateUI(); 
+        }
+        
+        updateTodoStatus(todoId: string, completed: boolean): void {
+                const todo = this.todos.find((todo) => todo.id === todoId);
+                if (todo) {
+                        todo.completed = completed;
+                        this.updateUI(); 
+                }
+        }
+
 }
 
 
@@ -114,4 +150,11 @@ function getRandomColor() {
             color += letters[Math.floor(Math.random() * 16)];
         }
         return color;
+}
+
+
+export interface IToDo {
+        id: string;
+        description: string;
+        completed: boolean;
 }
