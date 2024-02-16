@@ -5,7 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Master</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons+Round">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    
+    <link rel="stylesheet" href="components.css">
     <link rel="stylesheet" href="style.css">
+    
 </head>
 <body>
     <aside id="slidebar">
@@ -18,7 +22,7 @@
     
     <main id="content">
         <!-- PROYECTOS -->
-        <div id="project-page" class="page">
+        <div id="project-page" class="page" style="display: none;">
             <dialog id="error">
                 <div id="errorMensaje">
                     <span style="color: beige;" class="material-icons-round "> priority_high</span>
@@ -113,56 +117,56 @@
 
 
             <!-- ********************************************EDITA PROJECT -->
-        <dialog id="edit-project-modal" class="edit-modal" >
-            <form id="edit-project-form">
-                <h2>Edit Project</h2>
-                <div class="input-list">
-                    <div class="form-field-container">
-                        <label><span class="material-icons-round">apartment</span>Nombre</label>
-                        <input name="nameEdit" type="text">
-                        <p style="color: gray; font-size: var(--font-sm); margin-top: 5px; font-style: italic;">TIP: Mejor usar un nombre corto</p>
-                    </div>
+            <dialog id="edit-project-modal" class="edit-modal" >
+                <form id="edit-project-form">
+                    <h2>Edit Project</h2>
+                    <div class="input-list">
+                        <div class="form-field-container">
+                            <label><span class="material-icons-round">apartment</span>Nombre</label>
+                            <input name="nameEdit" type="text">
+                            <p style="color: gray; font-size: var(--font-sm); margin-top: 5px; font-style: italic;">TIP: Mejor usar un nombre corto</p>
+                        </div>
 
-                    <div class="form-field-container">
-                        <label><span class="material-icons-round">subject</span>Descripción</label>
-                        <textarea name="descriptionEdit" cols="30" rows="5" ></textarea>
-                    </div>
-                    <div class="form-field-container">
-                        <label><span class="material-icons-round">person</span>Rol</label>
-                        <select name ="userRoleEdit">
-                            <option>Arquitecto</option>
-                            <option>Ingeniero</option>
-                            <option>Modelador</option>
-                        </select>
-                    </div>
-                    <div class="form-field-container">
-                        <label><span class="material-icons-round">not_listed_location</span>Estado</label>
-                        <select name="statusEdit">
-                            <option>Pendiente</option>
-                            <option>Activo</option>
-                            <option>Acabado</option>
-                        </select>
-                    </div>
-                    <div class="form-field-container">
-                        <label for="finishDateEdit">
-                        <span class="material-icons-round">calendar_month</span>
-                        Dia finalizado
-                        </label>
-                        <input name="finishDate" type="date" ></input>
-                    </div>
-                    <div class="form-field-container">
-                        <label><span class="material-icons-round">euro</span>Coste</label>
-                        <input name="coste" type="text" ></input>
-                    </div>
-                    <div style="display: flex; margin: 10px 0px 10px auto; column-gap: 10px;">
-                        <!-- <button id="cancela-btn" type="button">Cancela</button> -->
-                        <button id="cancelaEdita" type="button">Cancela</button>
-                        <!-- <button type="submit">Acepta</button> -->
-                        <button id="aceptaEdita" type="button">Acepta</button>
-                    </div>
-                </div> 
-            </form>
-        </dialog>
+                        <div class="form-field-container">
+                            <label><span class="material-icons-round">subject</span>Descripción</label>
+                            <textarea name="descriptionEdit" cols="30" rows="5" ></textarea>
+                        </div>
+                        <div class="form-field-container">
+                            <label><span class="material-icons-round">person</span>Rol</label>
+                            <select name ="userRoleEdit">
+                                <option>Arquitecto</option>
+                                <option>Ingeniero</option>
+                                <option>Modelador</option>
+                            </select>
+                        </div>
+                        <div class="form-field-container">
+                            <label><span class="material-icons-round">not_listed_location</span>Estado</label>
+                            <select name="statusEdit">
+                                <option>Pendiente</option>
+                                <option>Activo</option>
+                                <option>Acabado</option>
+                            </select>
+                        </div>
+                        <div class="form-field-container">
+                            <label for="finishDateEdit">
+                            <span class="material-icons-round">calendar_month</span>
+                            Dia finalizado
+                            </label>
+                            <input name="finishDate" type="date" ></input>
+                        </div>
+                        <div class="form-field-container">
+                            <label><span class="material-icons-round">euro</span>Coste</label>
+                            <input name="coste" type="text" ></input>
+                        </div>
+                        <div style="display: flex; margin: 10px 0px 10px auto; column-gap: 10px;">
+                            <!-- <button id="cancela-btn" type="button">Cancela</button> -->
+                            <button id="cancelaEdita" type="button">Cancela</button>
+                            <!-- <button type="submit">Acepta</button> -->
+                            <button id="aceptaEdita" type="button">Acepta</button>
+                        </div>
+                    </div> 
+                </form>
+            </dialog>
 <!-- ********************************************EDITA PROJECT -->
             <header>
                     <div>
@@ -172,79 +176,20 @@
             </header>
             <div class="main-page-content">
                     <div style="display: flex; flex-direction: column; row-gap: 30px;">
-                        <div class="dashboard-card" style="padding: 30px 0;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0px 30px; margin-bottom: 30px;">
-                                <p data-project-info="iniciales" style="font-size: 20px; background-color: #ca8134; aspect-ratio: 1; border-radius: 100%; padding: 12px;">HC</p>
-                                <button id="btnEdit" class="btn-secondary"><p style="width: 100%;">Edit</p></button>
-                            </div>
-                            <div style="padding: 0 30px;">
-                                <div>
-                                    <h5 data-project-info="name2">Hospital Center</h5>
-                                    <p data-project-info="description2">Community hospital located at downtown</p>
-                                </div>
-                                <div style="display: flex; column-gap: 30px; padding: 30px 0px; justify-content: space-between;">
-                                    <div>
-                                        <p style="color: #969696; font-size: var(--font-sm)">Status</p>
-                                        <p data-project-info="estado2">Active</p>
-                                    </div>
-                                    <div>
-                                        <p style="color: #969696; font-size: var(--font-sm)">Cost</p>
-                                        <p data-project-info="coste2">$ 2'542.000</p>
-                                    </div>
-                                    <div>
-                                        <p style="color: #969696; font-size: var(--font-sm)">Role</p>
-                                        <p data-project-info="role2">Engineer</p>
-                                    </div>
-                                    <div>
-                                        <p style="color: #969696; font-size: var(--font-sm)">Finish Date</p>
-                                        <p data-project-info="fecha-fin2"> 2023-05-01</p>
-                                    </div>
-                                </div>
-                                <div style="background-color: #404040; border-radius: 9999px; overflow: auto;">
-                                    <div data-project-info="progress" style="width: 80%; background-color: green; padding: 4px 0; text-align: center;">80%</div>
-                                </div>
-                            </div>
-                        </div>
-
+                        <div class="dashboard-card" style="padding: 30px 0;"></div>
 
                         <div class="dashboard-card" style="flex-grow: 1;">
                             <div style="padding: 20px 30px; display: flex; align-items: center; justify-content: space-between;">
-                            <h4>To-Do</h4>
-                            <div style="display: flex; align-items: center; justify-content: end; column-gap: 20px;">
-                                <div style="display: flex; align-items: center; column-gap: 10px;">
-                                    <span class="material-icons-round">search</span>
-                                    <input type="text" placeholder="Search To-Do's by name" style="width: 100%;">
-                                </div>
-                                <span id="btnAddTodo" class="material-icons-round">add</span>
-                            </div>
-                            </div>
-                            <div style="display: flex; flex-direction: column; padding: 10px 30px; row-gap:20px;">
-                            <!-- <div class="todo-item">
-                                <div style="display: flex; justify-content: space-between; align-items: center;">
-                                    <div style="display: flex; column-gap: 15px; align-items: center;">
-                                        <span class="material-icons-round" style="padding: 10px; background-color: #686868; border-radius: 10px;">construction</span>
-                                        <p>Make anything here as you want, even something longer.</p>
+                                <h4>To-Do</h4>
+                                <div style="display: flex; align-items: center; justify-content: end; column-gap: 20px;">
+                                    <div style="display: flex; align-items: center; column-gap: 10px;">
+                                        <span class="material-icons-round">search</span>
+                                        <input type="text" placeholder="Search To-Do's by name" style="width: 100%;">
                                     </div>
-                                    <p style="text-wrap: nowrap; margin-left: 10px;">Fri, 20 sep</p>
+                                    <span id="btnAddTodo" class="material-icons-round">add</span>
                                 </div>
                             </div>
-                            </div> -->
-
-                            <!-- <div style="display: flex; flex-direction: column; padding: 10px 30px; row-gap: 20px;">
-                                 Formulario para agregar nuevo TO-DO 
-                                <form id="todo-form">
-                                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                                        <div style="display: flex; column-gap: 15px; align-items: center;">
-                                            <span class="material-icons-round" style="padding: 10px; background-color: #686868; border-radius: 10px;">construction</span>
-                                            <input type="text" id="todo-description" placeholder="Enter TO-DO description">
-                                        </div>
-                                        <button id="add-todo-btn" type="button" >Add</button>
-                                    </div>
-                                </form>
-                        
-                                Lista de TO-DOs 
-                                <div id="todo-list"></div>
-                            </div> -->
+                            
                             <div style="display: flex; flex-direction: column; padding: 10px 30px; row-gap: 20px;">
                                 <!-- Formulario para agregar nuevo TO-DO -->
                                 <form id="todo-form">
@@ -256,23 +201,17 @@
                                         <button id="add-todo-btn" type="button">Add</button>
                                     </div>
                                 </form>
-                            
-                                <!-- Lista de TO-DOs -->
                                 <div style="display: flex; flex-direction: column; padding: 10px 30px; row-gap:20px;">
-                                    <div class="todo-item" id="todo-list">
-                                        
-                                    </div>
-                                </div>
-                                
+                                    <div class="todo-item" id="todo-list"></div>
+                                </div> 
                             </div>
-                            
-
                         </div>
 
 
                     </div>
-                    <div id="viewer-container" class="dashboard-card"></div>
-            </div>
+                    <div id="viewer-container" class="dashboard-card" style="min-width: 0; position : relative;"></div>
+            </div> 
+            
         </div>
 
     </main> 

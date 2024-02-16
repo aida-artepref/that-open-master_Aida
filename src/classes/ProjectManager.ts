@@ -15,7 +15,16 @@ export class ProjectManager {
 
     // Constructor que toma un contenedor HTML donde se mostrarán los proyectos
     constructor(container: HTMLElement) {
-        this.ui = container;
+        this.ui = container
+        const project=this.newProject({
+            name: "por defecto",
+            description: "esto es la descripcion del proyecto",
+            status: "Pendiente",
+            userRole: "Arquitecto",
+            finishDate: new Date(),
+            todos: []
+        })
+        project.ui.click()
     }
     
     newProject(data: IProject): Project {
@@ -275,15 +284,15 @@ export class ProjectManager {
     }
     
     private findProjectCard(projectId: string): HTMLElement | null {
-    const projectCards = this.ui.querySelectorAll('.project-card');
-    for (const card of projectCards) {
-        const projectIdAttribute = card.getAttribute('data-project-id');
-        if (projectIdAttribute === projectId) {
-            return card as HTMLElement;
-        }
+        const projectCards = this.ui.querySelectorAll('.project-card');
+            for (const card of projectCards) {
+                const projectIdAttribute = card.getAttribute('data-project-id');
+                if (projectIdAttribute === projectId) {
+                    return card as HTMLElement;
+                }
+            }
+        return null;
     }
-    return null;
-}
-   
+
 
 }

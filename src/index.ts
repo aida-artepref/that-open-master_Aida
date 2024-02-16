@@ -1,6 +1,11 @@
+import * as THREE from "three"
+import * as OBC from "openbim-components"
+import{GUI} from "three/examples/jsm/libs/lil-gui.module.min"
+import {OrbitControls} from "three/examples/jsm/controls/OrbitControls"
 import{ IProject, ProjectStatus, UserRole, IToDo} from "./classes/Project.ts"
 import { ProjectManager } from "./classes/ProjectManager.ts"
-
+import {OBJLoader} from "three/examples/jsm/loaders/OBJLoader"
+import {MTLLoader} from "three/examples/jsm/loaders/MTLLoader"
 
 function showModal(id: string) {
     const modal = document.getElementById(id)
@@ -21,7 +26,7 @@ function closeModal(id: string) {
 }
 
 const projectListUI=document.getElementById("project-list") as HTMLElement
-const projectManager=new ProjectManager(projectListUI)
+//const projectManager=new ProjectManager(projectListUI)
 
 
 
@@ -29,7 +34,6 @@ const projectManager=new ProjectManager(projectListUI)
 const newProjectBtn=document.getElementById("new-proyect-btn");
 if (newProjectBtn) {
     newProjectBtn.addEventListener("click", () => {showModal("new-project-modal")})
-   
 } else {
     console.warn("No se ha encontrado el botón de nuevos proyectos")
 }
@@ -74,7 +78,7 @@ if (projectForm && projectForm instanceof HTMLFormElement) {
             toggleModal("error")
 
         }
-        projectManager.getTotalCost();
+       // projectManager.getTotalCost();
     })
 } else {
     console.warn("The project form was not found. Check the ID!")
@@ -355,4 +359,189 @@ function formatDate(date) {
     const weekday = new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(date);
     return `${weekday},  ${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
 }
+
+/*
+// Visor ---- escena + camara + luces + renderer
+const scene= new THREE.Scene()
+
+
+const viewerContainer=document.getElementById("viewer-container") as HTMLElement;
+// const continerDimensions=viewerContainer.getBoundingClientRect()
+// const aspectRatio=continerDimensions.width/continerDimensions.height 
+const camera = new THREE.PerspectiveCamera(75)
+camera.position.z = 5 
+
+const renderer =new THREE.WebGLRenderer({alpha: true , antialias:true})
+viewerContainer.append(renderer.domElement)
+// renderer.setSize(continerDimensions.width, continerDimensions.height )
+
+
+//---------- Responsive ---------- 
+function resizeViewer(){//cuando la ventana cambia de tamaño
+    const containerDimension=viewerContainer.getBoundingClientRect()   // obtenemos la dimension de visor
+    renderer.setSize(containerDimension.width,containerDimension.height) //con ese tamaño obtenemos el tamaño del render
+    const aspectRatio=containerDimension.width/containerDimension.height   //recalcula la relacion de espacio
+    camera.aspect= aspectRatio;  //en la camara
+    camera.updateProjectionMatrix() //actualiza propiedades de camara
+}
+
+window.addEventListener("resize",resizeViewer) 
+resizeViewer()
+
+const geometry= new THREE.BoxGeometry()
+const material= new THREE.MeshStandardMaterial()
+const cube = new THREE.Mesh(geometry, material )
+
+const directionLight = new THREE.DirectionalLight()
+const ambientLight = new THREE.AmbientLight()
+ambientLight.intensity=0.5
+
+//scene.add(cube, directionLight, ambientLight )
+scene.add( directionLight, ambientLight )
+
+
+const cameraControls=new OrbitControls(camera, viewerContainer)
+
+function renderScene(){
+    renderer.render(scene, camera)
+    window.requestAnimationFrame(renderScene)
+}
+
+renderScene();
+
+const axes= new THREE.AxesHelper()
+const grid =new THREE.GridHelper()
+grid.material.transparent=true;
+grid.material.opacity=0.4
+grid.material.color= new THREE.Color("#grey")
+
+scene.add(grid, axes)
+
+const gui = new GUI()
+
+const cubeControls=gui.addFolder("Cube")
+cubeControls.add(cube.position, "x", -10, 10, 1)
+cubeControls.add(cube.position, "y", -10, 10, 1)
+cubeControls.add(cube.position, "z", -10, 10, 1)
+cubeControls.add(cube,"visible")
+cubeControls.addColor(cube.material,"color")
+
+
+const lightControls= gui.addFolder("Luz direccional") // nuevo ayudante de control para la luz direccional
+lightControls.add(directionLight.position, "x", -10, 10, 1).name("x");
+lightControls.add(directionLight.position, "y", -10, 10, 1).name("y");
+lightControls.add(directionLight.position, "z", -10, 10, 1).name("z");
+lightControls.addColor(directionLight, "color").name("Color Luz");
+lightControls.add(directionLight, "intensity", 0, 100).name("Intensidad");
+
+
+
+const objLoader = new OBJLoader()
+const mtlLoader= new MTLLoader()
+
+
+mtlLoader.load("../assets/Gear/Gear1.mtl", (materials) => {
+    materials.preload()
+    objLoader.setMaterials(materials)
+    objLoader.load("../assets/Gear/Gear1.obj", (mesh) => {
+        scene.add(mesh)
+    })
+})
+*/
+const geometry= new THREE.BoxGeometry()
+const material= new THREE.MeshStandardMaterial()
+const cube = new THREE.Mesh(geometry, material )
+
+
+const viewer = new OBC.Components() 
+const sceneComponents= new OBC.SimpleScene(viewer)
+viewer.scene= sceneComponents
+sceneComponents.setup()
+const scene=sceneComponents.get()
+scene.background= null
+
+const viewerContainer=document.getElementById("viewer-container")as HTMLDivElement
+const rendererComponent= new OBC.PostproductionRenderer(viewer,viewerContainer)
+viewer.renderer=rendererComponent
+
+const cameraComponent= new OBC.OrthoPerspectiveCamera(viewer)
+viewer.camera= cameraComponent
+
+const raycasterComponent= new OBC.SimpleRaycaster(viewer)
+viewer.raycaster=raycasterComponent
+
+viewer.init()
+cameraComponent.updateAspect()
+rendererComponent.postproduction.enabled=true
+
+
+const ifcLoader = new OBC.FragmentIfcLoader(viewer)
+ifcLoader.settings.wasm={
+    path:"https://unpkg.com/web-ifc@0.0.43/",
+    absolute: true
+}
+const highlingther= new OBC.FragmentHighlighter(viewer)
+highlingther.setup()
+
+const propertiesProcessor = new OBC.IfcPropertiesProcessor(viewer)
+highlingther.events.select.onClear.add(()=>{
+    propertiesProcessor.cleanPropertiesList()
+})
+
+
+
+const classifier = new OBC.FragmentClassifier(viewer)
+const classificationWindow = new OBC.FloatingWindow(viewer)
+classificationWindow.visible=false
+viewer.ui.add(classificationWindow)
+classificationWindow.title="Model Groups"
+
+const classificationsBtn = new OBC.Button(viewer)
+classificationsBtn.materialIcon = "account_tree"
+classificationsBtn.onClick.add(()=>{
+    classificationWindow.visible=!classificationWindow.visible
+    classificationsBtn.active=classificationWindow.visible
+})
+
+async function createModelTree(){
+    const fragmentTree = new OBC.FragmentTree(viewer)
+    await fragmentTree.init()
+    await fragmentTree.update(["model","storeys","entities"])
+    fragmentTree.onHovered.add((fragmentMap)=>{
+        highlingther.highlightByID("hover",fragmentMap)
+    })
+    fragmentTree.onSelected.add((fragmentMap)=>{
+        highlingther.highlightByID("select",fragmentMap)
+    })
+    const tree = fragmentTree.get().uiElement.get("tree")
+    return tree;
+}
+
+ifcLoader.onIfcLoaded.add(async (model)=>{
+    highlingther.update();
+    console.log(model)
+    classifier.byStorey(model)
+    classifier.byEntity(model)
+    classifier.byModel(model.name,model)
+    classifier.get()
+    const tree= await createModelTree()
+    await classificationWindow.slots.content.dispose(true)
+    classificationWindow.addChild(tree)
+
+    propertiesProcessor.process(model)
+    highlingther.events.select.onHighlight.add((fragmentMap) => {
+        const expressID=[...Object.values(fragmentMap)[0]][0]
+        propertiesProcessor.renderProperties(model, Number (expressID))
+    })
+})
+
+
+const toolbar= new OBC.Toolbar(viewer)
+toolbar.addChild(
+    ifcLoader.uiElement.get("main"),
+    classificationsBtn,
+    propertiesProcessor.uiElement.get("main")
+)
+
+viewer.ui.addToolbar(toolbar)
 
