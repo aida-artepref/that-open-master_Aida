@@ -1,3 +1,4 @@
+
 import * as THREE from "three"
 import * as OBC from "openbim-components"
 import{GUI} from "three/examples/jsm/libs/lil-gui.module.min"
@@ -6,6 +7,8 @@ import{ IProject, ProjectStatus, UserRole, IToDo} from "./classes/Project.ts"
 import { ProjectManager } from "./classes/ProjectManager.ts"
 import {OBJLoader} from "three/examples/jsm/loaders/OBJLoader"
 import {MTLLoader} from "three/examples/jsm/loaders/MTLLoader"
+import {Fragment, FragmentsGroup} from "bim-fragment"
+import { TodoCreator } from "./bim-components/TodoCreator"
 
 function showModal(id: string) {
     const modal = document.getElementById(id)
@@ -474,6 +477,29 @@ viewer.init()
 cameraComponent.updateAspect()
 rendererComponent.postproduction.enabled=true
 
+const fragmentManager= new OBC.FragmentManager(viewer)
+
+function exportFragments(model: FragmentsGroup){
+    //crea .frag (solo geometria) y descarga
+    const fragmentbinary=fragmentManager.export(model)
+    const blob = new Blob([fragmentbinary]);
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${model.name.replace(".ifc","")}.frag`
+    a.click();
+    URL.revokeObjectURL(url);
+
+    //crea json con propiedades del modelo cargado y descarga archivo
+    const json =JSON.stringify(model.properties,null,2) //convierte el objeto de propiedades del modelo en JSON
+    const propBlob=new Blob([json], {type:"application/json"}); //crea un objeto Blob a partir de la cadena JSON
+    const propUrl = URL.createObjectURL(propBlob); //crea una URL para el objeto Blob:
+    const propLink = document.createElement("a"); //crea un elemento de enlace y establece su atributo href en la URL del objeto Blob
+    propLink.href=propUrl;
+    propLink.download=`${model.name.replace(".ifc","")}.json` //establece el atributo download del enlace en el nombre de archivo deseado
+    propLink.click(); //simula un clic en el enlace para descargar el archivo JSON
+    URL.revokeObjectURL(propUrl);
+}
 
 const ifcLoader = new OBC.FragmentIfcLoader(viewer)
 ifcLoader.settings.wasm={
@@ -487,8 +513,6 @@ const propertiesProcessor = new OBC.IfcPropertiesProcessor(viewer)
 highlingther.events.select.onClear.add(()=>{
     propertiesProcessor.cleanPropertiesList()
 })
-
-
 
 const classifier = new OBC.FragmentClassifier(viewer)
 const classificationWindow = new OBC.FloatingWindow(viewer)
@@ -517,30 +541,140 @@ async function createModelTree(){
     return tree;
 }
 
-ifcLoader.onIfcLoaded.add(async (model)=>{
-    highlingther.update();
-    console.log(model)
-    classifier.byStorey(model)
-    classifier.byEntity(model)
-    classifier.byModel(model.name,model)
-    classifier.get()
-    const tree= await createModelTree()
-    await classificationWindow.slots.content.dispose(true)
-    classificationWindow.addChild(tree)
-
-    propertiesProcessor.process(model)
-    highlingther.events.select.onHighlight.add((fragmentMap) => {
-        const expressID=[...Object.values(fragmentMap)[0]][0]
-        propertiesProcessor.renderProperties(model, Number (expressID))
-    })
+//Optimizacion del visor (solo los mkostrados son procesados)
+const culler = new OBC.ScreenCuller(viewer)
+cameraComponent.controls.addEventListener("sleep",()=>{
+    culler.needsUpdate=true
 })
+
+async function onModelLoaded(model: FragmentsGroup){
+    highlingther.update();
+    for(const fragment of model.items){culler.add(fragment.mesh)}
+    culler.needsUpdate=true
+
+    try{
+        console.log(model)
+        classifier.byStorey(model)
+        classifier.byEntity(model)
+        classifier.byModel(model.name,model)
+        classifier.get()
+        const tree= await createModelTree()
+        await classificationWindow.slots.content.dispose(true)
+        classificationWindow.addChild(tree)
+
+        propertiesProcessor.process(model)
+        highlingther.events.select.onHighlight.add((fragmentMap) => {
+            const expressID=[...Object.values(fragmentMap)[0]][0]
+            propertiesProcessor.renderProperties(model, Number (expressID))
+        })  
+    } catch(error){
+        alert(error)
+    }
+}
+
+ifcLoader.onIfcLoaded.add(async (model)=>{
+    exportFragments(model)
+    // highlingther.update();
+    // console.log(model)
+    // classifier.byStorey(model)
+    // classifier.byEntity(model)
+    // classifier.byModel(model.name,model)
+    // classifier.get()
+    // const tree= await createModelTree()
+    // await classificationWindow.slots.content.dispose(true)
+    // classificationWindow.addChild(tree)
+
+    // propertiesProcessor.process(model)
+    // highlingther.events.select.onHighlight.add((fragmentMap) => {
+    //     const expressID=[...Object.values(fragmentMap)[0]][0]
+    //     propertiesProcessor.renderProperties(model, Number (expressID))
+    // })
+    onModelLoaded(model)
+})
+
+
+fragmentManager.onFragmentsLoaded.add((model)=>{
+    model.properties = {}
+    onModelLoaded(model)
+})
+
+const importFragmentBtn = new OBC.Button(viewer)
+importFragmentBtn.materialIcon="upload"
+importFragmentBtn.tooltip="Load FRAG"
+
+importFragmentBtn.onClick.add(()=>{
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.frag';
+
+    const reader = new FileReader();  // Crear un lector de archivos
+    reader.addEventListener("load", async () => {
+        const binary = reader.result;
+        if (!(binary instanceof ArrayBuffer)) {return;}
+        const fragmentBinary = new Uint8Array(binary)
+        await fragmentManager.load(fragmentBinary)
+    })
+
+
+    input.addEventListener('change', () => {
+        const fileList = input.files;
+
+        if (!fileList) {
+        return;
+        }
+        reader.readAsArrayBuffer(fileList[0]);
+    });
+    input.click();
+})
+
+function importJsonProp(model: FragmentsGroup){
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+
+    const reader = new FileReader();  // Crear un lector de archivos
+    reader.addEventListener("load", async () => {
+        const json = reader.result;
+        if (!json) {return;}
+        model.properties = JSON.parse(json as string)
+        onModelLoaded(model)
+    });
+    input.addEventListener('change', () => {
+        const fileList = input.files;
+
+        if (!fileList) {
+        return;
+        }
+        const file=fileList[0]
+        reader.readAsText(file)
+    });
+    input.click();
+}
+// fragmentManager.onFragmentsLoaded.add(async(model)=>{
+//     importJsonProp(model)
+// })
+
+
+
+fragmentManager.onFragmentsLoaded.add((model)=>{
+    model.properties = {}
+    onModelLoaded(model)
+    importJsonProp(model)
+})
+
+
+/*M3-4.2 configurar interface us de herramienta*/
+const todoCreator = new TodoCreator (viewer)
 
 
 const toolbar= new OBC.Toolbar(viewer)
 toolbar.addChild(
     ifcLoader.uiElement.get("main"),
     classificationsBtn,
-    propertiesProcessor.uiElement.get("main")
+    importFragmentBtn,
+    propertiesProcessor.uiElement.get("main"),
+    fragmentManager.uiElement.get("main"),
+    todoCreator.uiElement.get("activationButton")
 )
 
 viewer.ui.addToolbar(toolbar)
